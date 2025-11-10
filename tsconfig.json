@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
+    "strict": true,
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@store/*": ["src/store/*"],
+      "@adapters/*": ["src/adapters/*"],
+      "@ui/*": ["src/ui/*"],
+      "@tests/*": ["src/tests/*"]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["src", "vitest.setup.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
+
