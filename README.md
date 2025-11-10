@@ -36,7 +36,7 @@ The dev server boots on `http://localhost:5173` by default (see `vite.config.ts`
 }
 ```
 
-## Design considerations
+## Design Considerations
 
 In order to choose the correct implementation of our nested tree, it is important to consider how users will interact with this drag-and-drop schema editor, including what future needs they may have. My assumptions are listed below:
 
@@ -98,4 +98,4 @@ An additional requirement is that the order of children must be preserved. Fract
 
 Given all of this, and that we are building a toy example, I have chosen to implement an adjacency list using integer gapped fractional keys. In a mature production instance, one may find that users want to share schema fragments (e.g. reusable schemas like {image, headline, copy}), reference properties from other trees (e.g. company address), or perform complex subtree queries in which case the complexity of a closure table would be justified. Additionally, lexicographic fractional keys would prove more practical in production, but using an existing implementation, as recommended, would defeat the purpose of this toy example.
 
-## Implementation details
+## Implementation Details
