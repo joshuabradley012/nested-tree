@@ -14,7 +14,6 @@ The dev server boots on `http://localhost:5173` by default (see `vite.config.ts`
 ## Example tree
 
 ```json
-// Schema definition
 {
   id: "root",
   name: "Root",
@@ -100,3 +99,4 @@ Given all of this, and that we are building a toy example, I have chosen to impl
 - /src/core/model.ts contains useful, stateless primitives for maniuplating our adjacency list
   - With one exception, primitives take advantage of recursion. This creates a larger memory footprint, but a more elegant implementation. Because this is a toy example, I chose algorithmic purity over pragmatism. The exception is `assertCycleFree` which must use iteration to avoid getting stuck in a recursive subroutine
   - In production, there should be more guards against malformed data containing cycles, multiple parents, etc
+- /src/core/ops.ts contains the core adjacency list API (insert, update, delete, move) all of which compose model helpers to create state mutations
