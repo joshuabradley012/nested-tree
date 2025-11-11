@@ -20,20 +20,22 @@ import {
   makeGapKey,
   normalizeOrderKeys,
   prepareInsertOrderKey,
+} from "./model";
+import {
   assertNodeIsValid,
   assertNodeIsUnique,
   assertNodeExists,
   assertParentExists,
   assertCycleFree,
   assertValidMove,
-} from "./model";
+} from "./invariants";
 
 export function insertNode(initialState: TreeState, parentId: string, node: Node): OperationResult<TreeState> {
   const validNode = assertNodeIsValid(node);
   if (!validNode.success) return validNode;
 
-  const isUniqueNode = assertNodeIsUnique(initialState, node.id);
-  if (!isUniqueNode.success) return isUniqueNode;
+  const uniqueNode = assertNodeIsUnique(initialState, node.id);
+  if (!uniqueNode.success) return uniqueNode;
 
   const parentNode = assertNodeExists(initialState, parentId);
   if (!parentNode.success) return parentNode;

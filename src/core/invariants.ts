@@ -1,0 +1,86 @@
+import type {
+  TreeState,
+  Node,
+  OperationResult
+} from "./types";
+import {
+  findNodeById,
+  findParentNode,
+} from "./model";
+
+export function assertNodeIsUnique(state: TreeState, nodeId: string): OperationResult<void> {
+  const existingNode = findNodeById(state, nodeId);
+  if (existingNode) {
+    return { success: false, error: { kind: "DuplicateNode", nodeId } };
+  }
+  return { success: true, data: undefined }
+}
+
+export function assertNodeIsValid(node: Node): OperationResult<Node> {
+  if (!node.id) {
+    return { success: false, error: { kind: "InvalidNode", node } }
+  }
+  return { success: true, data: node }
+}
+
+export function assertNodeExists(state: TreeState, nodeId: string): OperationResult<Node> {
+  const node = findNodeById(state, nodeId);
+  if (!node) {
+    return { success: false, error: { kind: "NodeNotFound", nodeId } };
+  }
+  return { success: true, data: node };
+}
+
+export function assertParentExists(state: TreeState, nodeId: string): OperationResult<Node> {
+  const parent = findParentNode(state, nodeId);
+  if (!parent) {
+    return { success: false, error: { kind: "ParentNotFound", nodeId } };
+  }
+  return { success: true, data: parent };
+}
+
+export function assertCycleFree(state: TreeState, nodeId: string): OperationResult<void> {
+  const visited = new Set<string>();
+  const path: string[] = [];
+  let currentId: string | null = nodeId;
+
+  while (currentId !== null) {
+    if (visited.has(currentId)) {
+      const cycleStartIndex = path.indexOf(currentId);
+      const cyclePath =
+        cycleStartIndex >= 0 ? [...path.slice(cycleStartIndex), currentId] : [currentId, currentId];
+      return { success: false, error: { kind: "CycleDetected", path: cyclePath } };
+    }
+
+    visited.add(currentId);
+    path.push(currentId);
+
+    const node = findNodeById(state, currentId);
+    if (!node) {
+      break;
+    }
+
+    currentId = node.parentId;
+  }
+
+  return { success: true, data: undefined };
+}
+
+export function assertValidMove(state: TreeState, nodeId: string, parentId: string): OperationResult<void> {
+  if (parentId === nodeId) {
+    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: "NodeIsParent" } }
+  }
+  const nodeResult = assertNodeExists(state, nodeId);
+  if (!nodeResult.success) {
+    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: nodeResult.error.kind } };
+  }
+  const parentResult = assertNodeExists(state, parentId);
+  if (!parentResult.success) {
+    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: parentResult.error.kind } };
+  }
+  const cycleResult = assertCycleFree(state, nodeId);
+  if (!cycleResult.success) {
+    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: cycleResult.error.kind } };
+  }
+  return { success: true, data: undefined };
+}
