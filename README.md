@@ -13,7 +13,7 @@ The dev server boots on `http://localhost:5173` by default (see `vite.config.ts`
 
 ## Example tree
 
-```json
+```javascript
 {
   id: "root",
   name: "Root",
