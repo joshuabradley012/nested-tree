@@ -16,8 +16,11 @@ export type TreeState = {
 export type OrderIndexMap = Record<string, OrderKey>;
 
 export type OperationError =
+  | { kind: "InvalidNode"; node: Node }
+  | { kind: "DuplicateNode"; nodeId: string }
   | { kind: "NodeNotFound"; nodeId: string }
   | { kind: "ParentNotFound"; nodeId: string }
+  | { kind: "NodeIsParent"; nodeId: string }
   | { kind: "CycleDetected"; path: string[] }
   | { kind: "InvalidMove"; nodeId: string; parentId: string; reason: string };
 

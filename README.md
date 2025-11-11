@@ -18,17 +18,14 @@ The dev server boots on `http://localhost:5173` by default (see `vite.config.ts`
 {
   id: "root",
   name: "Root",
-  type: "text",
   children: [
     {
       id: "child-1",
       name: "Child 1",
-      type: "numeric",
       children: [
         {
           id: "child-1-1",
           name: "Child 1-1",
-          type: "text",
         }
       ]
     }
@@ -99,3 +96,7 @@ An additional requirement is that the order of children must be preserved. Fract
 Given all of this, and that we are building a toy example, I have chosen to implement an adjacency list using integer gapped fractional keys. In a mature production instance, one may find that users want to share schema fragments (e.g. reusable schemas like {image, headline, copy}), reference properties from other trees (e.g. company address), or perform complex subtree queries in which case the complexity of a closure table would be justified. Additionally, lexicographic fractional keys would prove more practical in production, but using an existing implementation, as recommended, would defeat the purpose of this toy example.
 
 ## Implementation Details
+
+- /src/core/model.ts contains useful, stateless primitives for maniuplating our adjacency list
+  - With one exception, primitives take advantage of recursion. This creates a larger memory footprint, but a more elegant implementation. Because this is a toy example, I chose algorithmic purity over pragmatism. The exception is `assertCycleFree` which must use iteration to avoid getting stuck in a recursive subroutine
+  - In production, there should be more guards against malformed data containing cycles, multiple parents, etc

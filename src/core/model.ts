@@ -6,9 +6,11 @@ import type {
   OperationResult,
 } from "./types";
 
-const orderGap = 10;
+export const orderGap = 10;
+export const minOrderGap = 1;
 
 export function createTreeState(): TreeState {
+  // crypto is availabe in the browser API: https://developer.mozilla.org/en-US/docs/Web/API/Crypto
   const rootId = crypto.randomUUID();
   return {
     rootId,
@@ -29,7 +31,10 @@ export function createTreeState(): TreeState {
 export function cloneTreeState(state: TreeState): TreeState {
   return {
     ...state,
-    nodesById: { ...state.nodesById },
+    nodesById: Object.fromEntries(
+      Object.entries(state.nodesById)
+        .map(([id, node]) => [id, { ...node }])
+    ),
     childrenById: Object.fromEntries(
       Object.entries(state.childrenById)
         .map(([parentId, children]) => [parentId, children.map(childId => childId)])
@@ -77,10 +82,49 @@ export function findSubtreeNodes(state: TreeState, nodeId: string): Node[] {
   return [node, ...children.flatMap(child => findSubtreeNodes(state, child.id))];
 }
 
+export function findNearestSiblings(state: TreeState, node: Node): Node[] {
+  if (!node.parentId) return [];
+
+  const siblings = findChildrenNodes(state, node.parentId)
+    .filter(sibling => sibling.id !== node.id)
+    .sort((a, b) => parseInt(a.orderKey) - parseInt(b.orderKey));
+
+  if (siblings.length === 0 || !node.orderKey) {
+    return siblings.slice(-1);
+  }
+
+  const targetKey = parseInt(node.orderKey);
+  let leftSibling: Node | null = null;
+  let rightSibling: Node | null = null;
+
+  for (const sibling of siblings) {
+    const siblingKey = parseInt(sibling.orderKey);
+    if (siblingKey < targetKey) {
+      leftSibling = sibling;
+      continue;
+    }
+
+    if (siblingKey === targetKey) {
+      const index = siblings.findIndex(({ id }) => id === sibling.id);
+      leftSibling = index > 0 ? siblings[index - 1] : leftSibling;
+      rightSibling = sibling;
+      break;
+    }
+
+    rightSibling = sibling;
+    break;
+  }
+
+  const nearest: Node[] = [];
+  if (leftSibling) nearest.push(leftSibling);
+  if (rightSibling) nearest.push(rightSibling);
+  return nearest;
+}
+
 export function makeGapKey(nodeA: Node, nodeB: Node): OrderKey {
   const nodeAKey = parseInt(nodeA.orderKey);
   const nodeBKey = parseInt(nodeB.orderKey);
-  const gap = (nodeBKey - nodeAKey) / 2;
+  const gap = nodeAKey + (nodeBKey - nodeAKey) / 2;
   return gap.toString();
 }
 
@@ -91,6 +135,21 @@ export function normalizeOrderKeys(children: Node[]): OrderIndexMap {
   });
   return orderIndexMap;
 } 
+
+export function assertNodeIsUnique(state: TreeState, nodeId: string): OperationResult<void> {
+  const existingNode = findNodeById(state, nodeId);
+  if (existingNode) {
+    return { success: false, error: { kind: "DuplicateNode", nodeId } };
+  }
+  return { success: true, data: undefined }
+}
+
+export function assertNodeIsValid(node: Node): OperationResult<Node> {
+  if (!node.id) {
+    return { success: false, error: { kind: "InvalidNode", node } }
+  }
+  return { success: true, data: node }
+}
 
 export function assertNodeExists(state: TreeState, nodeId: string): OperationResult<Node> {
   const node = findNodeById(state, nodeId);
@@ -137,19 +196,19 @@ export function assertCycleFree(state: TreeState, nodeId: string): OperationResu
 
 export function assertValidMove(state: TreeState, nodeId: string, parentId: string): OperationResult<void> {
   if (parentId === nodeId) {
-    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: "Parent ID is the same as the node ID" } }
+    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: "NodeIsParent" } }
   }
   const nodeResult = assertNodeExists(state, nodeId);
   if (!nodeResult.success) {
-    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: "Node does not exist" } };
+    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: nodeResult.error.kind } };
   }
   const parentResult = assertNodeExists(state, parentId);
   if (!parentResult.success) {
-    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: "Parent does not exist" } };
+    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: parentResult.error.kind } };
   }
   const cycleResult = assertCycleFree(state, nodeId);
   if (!cycleResult.success) {
-    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: "A cycle would be created" } };
+    return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: cycleResult.error.kind } };
   }
   return { success: true, data: undefined };
 }
