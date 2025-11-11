@@ -100,3 +100,5 @@ Considering all of this, and that we are building a toy example, I have chosen t
   - With one exception, primitives take advantage of recursion. This creates a larger memory footprint, but a more elegant implementation. Because this is a toy example, I chose algorithmic purity over pragmatism. The exception is `assertCycleFree` which must use iteration to avoid getting stuck in a recursive subroutine
   - In production, there should be more guards against malformed data containing cycles, multiple parents, etc
 - /src/core/ops.ts contains the core adjacency list API (insert, update, delete, move) all of which compose model helpers to create state mutations
+  - Currently, insertNode allows one to insert an orderKey, but this is inconsistent with our API for reorder which expects index. May be worth adding newIndex functionality to insert
+  - See /test/ops/insertNode.test.ts "normalizes sibling order keys when the gap between neighbors is too small" for how this can result in unexpected behavior, I would expect a collision to append, but it inserts in between
