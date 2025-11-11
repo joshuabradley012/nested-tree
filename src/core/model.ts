@@ -136,6 +136,61 @@ export function normalizeOrderKeys(children: Node[]): OrderIndexMap {
   return orderIndexMap;
 } 
 
+export function prepareInsertOrderKey(state: TreeState, parentId: string, node: Node): {
+  nextOrderKey: OrderKey,
+  normalizedOrderKeys: OrderIndexMap | null,
+  sortedChildren: Node[],
+} {
+  let nextOrderKey = node.orderKey;
+  let normalizedOrderKeys = null;
+  let sortedChildren = [] as Node[];
+
+  const existingChildren = findChildrenNodes(state, parentId);
+
+  if (nextOrderKey.length === 0) {
+    const maxOrderKey = existingChildren.reduce((max, child) => {
+      const key = parseInt(child.orderKey);
+      return Math.max(max, key);
+    }, 0);
+    nextOrderKey = (maxOrderKey + orderGap).toString();
+    return { nextOrderKey, normalizedOrderKeys, sortedChildren };
+  }
+
+  const siblings = findNearestSiblings(state, node);
+
+  if (siblings.length === 0) {
+    nextOrderKey = node.orderKey;
+  } else if (siblings.length === 1) {
+    const sibling = siblings[0];
+    nextOrderKey =
+      sibling.orderKey === node.orderKey
+        ? (parseInt(sibling.orderKey) + orderGap).toString()
+        : node.orderKey;
+  } else {
+    const [leftSibling, rightSibling] = siblings;
+    const leftKey = parseInt(leftSibling.orderKey);
+    const rightKey = parseInt(rightSibling.orderKey);
+
+    if (rightKey - leftKey <= minOrderGap) {
+      sortedChildren = existingChildren
+        .slice()
+        .sort((a, b) => parseInt(a.orderKey) - parseInt(b.orderKey));
+
+      const rightIndex = sortedChildren.findIndex(child => child.id === rightSibling.id);
+      const insertIndex = rightIndex >= 0 ? rightIndex : sortedChildren.length;
+
+      sortedChildren.splice(insertIndex, 0, node);
+      normalizedOrderKeys = normalizeOrderKeys(sortedChildren);
+      nextOrderKey = normalizedOrderKeys[node.id];
+    } else {
+      nextOrderKey = makeGapKey(leftSibling, rightSibling);
+    }
+  }
+
+  return { nextOrderKey, normalizedOrderKeys, sortedChildren };
+}
+
+
 export function assertNodeIsUnique(state: TreeState, nodeId: string): OperationResult<void> {
   const existingNode = findNodeById(state, nodeId);
   if (existingNode) {
