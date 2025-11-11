@@ -1,7 +1,8 @@
 import type {
   TreeState,
   Node,
-  OperationResult
+  OperationResult,
+  OperationError,
 } from "./types";
 import {
   findNodeById,
@@ -37,6 +38,67 @@ export function assertParentExists(state: TreeState, nodeId: string): OperationR
     return { success: false, error: { kind: "ParentNotFound", nodeId } };
   }
   return { success: true, data: parent };
+}
+
+export function assertChildrenConsistent(state: TreeState, parentId: string): OperationResult<Node[]> {
+  const childIds = state.childrenById[parentId] ?? [];
+  const seenIds = new Set<string>();
+  const resolvedChildren: Node[] = [];
+
+  for (const childId of childIds) {
+    if (seenIds.has(childId)) {
+      return { success: false, error: { kind: "DuplicateNode", nodeId: childId } };
+    }
+    seenIds.add(childId);
+
+    const node = findNodeById(state, childId);
+    if (!node) {
+      return { success: false, error: { kind: "NodeNotFound", nodeId: childId } };
+    }
+
+    if (node.parentId !== parentId) {
+      return { success: false, error: { kind: "ParentNotFound", nodeId: childId } };
+    }
+
+    resolvedChildren.push(node);
+  }
+
+  return { success: true, data: resolvedChildren };
+}
+
+export function assertOrderKeysStrict(state: TreeState, parentId: string): OperationResult<Node[]> {
+  const childrenResult = assertChildrenConsistent(state, parentId);
+  if (!childrenResult.success) {
+    return childrenResult;
+  }
+
+  const resolvedChildren = childrenResult.data;
+  let previousKey: number | null = null;
+
+  for (const child of resolvedChildren) {
+    const key = parseInt(child.orderKey);
+    if (Number.isNaN(key)) {
+      const error: OperationError = {
+        kind: "InvalidOrderKey",
+        nodeId: child.id,
+        orderKey: child.orderKey,
+      };
+      return { success: false, error };
+    }
+
+    if (previousKey !== null && key <= previousKey) {
+      const error: OperationError = {
+        kind: "InvalidOrderSequence",
+        parentId,
+        sequence: resolvedChildren.map(({ id }) => id),
+      };
+      return { success: false, error };
+    }
+
+    previousKey = key;
+  }
+
+  return { success: true, data: resolvedChildren };
 }
 
 export function assertCycleFree(state: TreeState, nodeId: string): OperationResult<void> {

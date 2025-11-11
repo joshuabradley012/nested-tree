@@ -22,6 +22,8 @@ export type OperationError =
   | { kind: "ParentNotFound"; nodeId: string }
   | { kind: "NodeIsParent"; nodeId: string }
   | { kind: "CycleDetected"; path: string[] }
+  | { kind: "InvalidOrderKey"; nodeId: string; orderKey: string }
+  | { kind: "InvalidOrderSequence"; parentId: string; sequence: string[] }
   | { kind: "InvalidMove"; nodeId: string; parentId: string; reason: string };
 
 export type OperationResult<T> = {

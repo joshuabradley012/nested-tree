@@ -77,7 +77,7 @@ D
   - Pros: fast reads, no recursion, moderately complex writes, supports DAGs as well as trees
   - Cons: complex implementation, large storage requirements O(n^2) in the worst case
 
-An additional requirement is that the order of children must be preserved. Fractional keys are the most scalable way to handle this. Again, let's explore the trade-offs of common fractional key implementations:
+Also, the order of children must be preserved. Fractional keys are the most scalable way to handle this. Again, let's explore the trade-offs of common fractional key implementations:
 
 - Integers with gaps: 
   - Definition: ordering uses gapped integers, such as 10, 20, 30
@@ -92,7 +92,7 @@ An additional requirement is that the order of children must be preserved. Fract
   - Pros: very infrequent compaction, and compaction is limited to subtrees, handles massive scale
   - Cons: complex implementation, recommended to use existing implementations such as LexoRank
 
-Given all of this, and that we are building a toy example, I have chosen to implement an adjacency list using integer gapped fractional keys. In a mature production instance, one may find that users want to share schema fragments (e.g. reusable schemas like {image, headline, copy}), reference properties from other trees (e.g. company address), or perform complex subtree queries in which case the complexity of a closure table would be justified. Additionally, lexicographic fractional keys would prove more practical in production, but using an existing implementation, as recommended, would defeat the purpose of this toy example.
+Considering all of this, and that we are building a toy example, I have chosen to implement an adjacency list using integer gapped fractional keys. In a mature production instance, one may find that users want to share schema fragments (e.g. reusable schemas like {image, headline, copy}), reference properties from other trees (e.g. company address), or perform complex subtree queries in which case the complexity of a closure table would be justified. Additionally, lexicographic fractional keys would prove more practical in production, but using an existing implementation, as recommended, would defeat the purpose of this toy example.
 
 ## Implementation Details
 

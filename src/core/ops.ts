@@ -25,6 +25,8 @@ import {
   assertNodeIsValid,
   assertNodeIsUnique,
   assertNodeExists,
+  assertChildrenConsistent,
+  assertOrderKeysStrict,
   assertParentExists,
   assertCycleFree,
   assertValidMove,
@@ -39,6 +41,9 @@ export function insertNode(initialState: TreeState, parentId: string, node: Node
 
   const parentNode = assertNodeExists(initialState, parentId);
   if (!parentNode.success) return parentNode;
+
+  const parentChildren = assertChildrenConsistent(initialState, parentId);
+  if (!parentChildren.success) return parentChildren;
 
   const state = cloneTreeState(initialState);
   state.childrenById[parentId] ??= [];
@@ -56,6 +61,10 @@ export function insertNode(initialState: TreeState, parentId: string, node: Node
   }
 
   state.nodesById[nextNode.id] = nextNode;
+
+  const orderCheck = assertOrderKeysStrict(state, parentId);
+  if (!orderCheck.success) return orderCheck;
+
   return { success: true, data: state };
 };
 
