@@ -161,10 +161,22 @@ export function prepareInsertOrderKey(state: TreeState, parentId: string, node: 
     nextOrderKey = node.orderKey;
   } else if (siblings.length === 1) {
     const sibling = siblings[0];
-    nextOrderKey =
+    const candidateKey =
       sibling.orderKey === node.orderKey
         ? (parseInt(sibling.orderKey) + orderGap).toString()
         : node.orderKey;
+
+    const candidateCollides = existingChildren.some(child => child.orderKey === candidateKey);
+
+    if (candidateCollides) {
+      const maxOrderKey = existingChildren.reduce((max, child) => {
+        const key = parseInt(child.orderKey);
+        return Math.max(max, key);
+      }, 0);
+      nextOrderKey = (maxOrderKey + orderGap).toString();
+    } else {
+      nextOrderKey = candidateKey;
+    }
   } else {
     const [leftSibling, rightSibling] = siblings;
     const leftKey = parseInt(leftSibling.orderKey);

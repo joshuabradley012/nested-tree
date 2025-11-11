@@ -99,7 +99,7 @@ describe("prepareInsertOrderKey", () => {
 
     const result = prepareInsertOrderKey(state, rootId, newNode);
 
-    expect(result.nextOrderKey).toBe((parseInt(leftSibling.orderKey) + orderGap).toString());
+    expect(parseInt(result.nextOrderKey, 10)).toBeGreaterThan(parseInt(rightSibling.orderKey, 10));
     expect(result.normalizedOrderKeys).toBeNull();
     expect(result.sortedChildren).toHaveLength(0);
   });
