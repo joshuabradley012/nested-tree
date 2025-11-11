@@ -32,6 +32,20 @@ export function assertNodeExists(state: TreeState, nodeId: string): OperationRes
   return { success: true, data: node };
 }
 
+export function assertUpdateNodeIsValid(state: TreeState, nodeId: string, node: Node): OperationResult<Node> {
+  const existingNode = assertNodeExists(state, nodeId);
+  if (!existingNode.success)
+    return existingNode;
+  if (node.id !== existingNode.data.id)
+    return { success: false, error: { kind: "InvalidUpdate", node, reason: "Cannot update node.id" } };
+  if (node.parentId !== existingNode.data.parentId)
+    return { success: false, error: { kind: "InvalidUpdate", node, reason: "Cannot update node.parentId" } };
+  if (node.orderKey !== existingNode.data.orderKey)
+    return { success: false, error: { kind: "InvalidUpdate", node, reason: "Cannot update node.orderKey" } };
+
+  return { success: true, data: existingNode.data };
+}
+
 export function assertParentExists(state: TreeState, nodeId: string): OperationResult<Node> {
   const parent = findParentNode(state, nodeId);
   if (!parent) {
@@ -128,7 +142,7 @@ export function assertCycleFree(state: TreeState, nodeId: string): OperationResu
   return { success: true, data: undefined };
 }
 
-export function assertValidMove(state: TreeState, nodeId: string, parentId: string): OperationResult<void> {
+export function assertValidMove(state: TreeState, nodeId: string, parentId: string): OperationResult<Node> {
   if (parentId === nodeId) {
     return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: "NodeIsParent" } }
   }
@@ -144,5 +158,5 @@ export function assertValidMove(state: TreeState, nodeId: string, parentId: stri
   if (!cycleResult.success) {
     return { success: false, error: { kind: "InvalidMove", nodeId, parentId, reason: cycleResult.error.kind } };
   }
-  return { success: true, data: undefined };
+  return { success: true, data: nodeResult.data };
 }

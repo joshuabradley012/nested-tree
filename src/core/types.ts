@@ -17,6 +17,7 @@ export type OrderIndexMap = Record<string, OrderKey>;
 
 export type OperationError =
   | { kind: "InvalidNode"; node: Node }
+  | { kind: "InvalidUpdate"; node: Node; reason: string }
   | { kind: "DuplicateNode"; nodeId: string }
   | { kind: "NodeNotFound"; nodeId: string }
   | { kind: "ParentNotFound"; nodeId: string }

@@ -3,7 +3,6 @@ import type {
   Node,
   OrderKey,
   OrderIndexMap,
-  OperationResult,
 } from "./types";
 
 export const orderGap = 10;
