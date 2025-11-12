@@ -40,6 +40,7 @@ describe("moveNode", () => {
 
     expect(state.nodesById.child1.orderKey).toBe("0");
   });
+
   test("handles moves within the same parent and updates sibling order", () => {
     const initialState: TreeState = {
       rootId: "root",
@@ -68,6 +69,7 @@ describe("moveNode", () => {
     expect(state.childrenById.parent).toEqual(["child1", "child2", "child3"]);
     expect(state.nodesById.child3.orderKey).toBe((orderGap * 2).toString());
   });
+
   test("rejects moves that target a descendant (cycle detection)", () => {
     const initialState = makeBaseState();
 
@@ -77,6 +79,7 @@ describe("moveNode", () => {
 
     expect(result.error.kind).toBe("CycleDetected");
   });
+
   test("rejects moves when the source node does not exist", () => {
     const initialState = makeBaseState();
     const result = moveNode(initialState, "missing", "parentB");
@@ -85,6 +88,7 @@ describe("moveNode", () => {
 
     expect(result.error.kind).toBe("InvalidMove");
   });
+
   test("rejects moves when the destination parent does not exist", () => {
     const initialState = makeBaseState();
     const result = moveNode(initialState, "child1", "missing-parent");

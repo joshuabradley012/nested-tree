@@ -90,7 +90,7 @@ export function deserializeTreeState(payload: SerializedTree): TreeState {
     });
 
     if (trimmedId !== validatedNode.id)
-      throw new Error("Invalid tree: nodes in nodesById must be indexed by an id that matches their internal key");
+      throw new Error("Invalid tree: nodes in nodesById must be indexed by an id that matches their internal id");
 
     tree.nodesById[trimmedId] = validatedNode;
   });

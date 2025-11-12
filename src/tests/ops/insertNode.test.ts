@@ -43,6 +43,7 @@ describe("insertNode", () => {
     expect(parseInt(insertedNode.orderKey, 10)).toBeGreaterThan(parseInt(existingChildren["child-2"].orderKey, 10));
     expect(insertedNode.parentId).toBe(parentId);
   });
+
   test("reassigns the new orderKey when the incoming key collides with an existing sibling", () => {
     const parentId = "parent";
     const firstOrderKey = "0";
@@ -78,6 +79,7 @@ describe("insertNode", () => {
     const insertedNode = state.nodesById["child-3"];
     expect(insertedNode.orderKey).toBe((orderGap * 2).toString());
   });
+
   test("normalizes sibling order keys when the gap between neighbors is too small", () => {
     const parentId = "parent";
 
@@ -119,6 +121,7 @@ describe("insertNode", () => {
     expect(state.nodesById["child-3"].orderKey).toBe(expectedOrderKeys["child-3"]);
     expect(state.nodesById["child-2"].orderKey).toBe(expectedOrderKeys["child-2"]);
   });
+
   test("returns an error when the node id already exists", () => {
     const parentId = "parent";
 
@@ -150,6 +153,7 @@ describe("insertNode", () => {
     if (result.error.kind !== "DuplicateNode") return;
     expect(result.error.nodeId).toBe("child-1");
   });
+
   test("returns an error when the parent does not exist", () => {
     const initialState: TreeState = {
       rootId: "root",
@@ -176,6 +180,7 @@ describe("insertNode", () => {
     if (result.error.kind !== "NodeNotFound") return;
     expect(result.error.nodeId).toBe("missing-parent");
   });
+
   test("returns an error when the parent’s child list is inconsistent before insertion", () => {
     const parentId = "parent";
 
