@@ -68,30 +68,6 @@ export function updateNode(initialState: TreeState, nodeId: string, node: Node):
   return { success: true, data: state };
 }
 
-export function deleteNode(initialState: TreeState, nodeId: string): OperationResult<TreeState> {
-  const existingNodeCheck = assertNodeExists(initialState, nodeId);
-  if (!existingNodeCheck.success) return existingNodeCheck;
-
-  const state = cloneTreeState(initialState);
-  const nodesToDelete = findDescendantNodes(state, nodeId);
-  const parentId = existingNodeCheck.data.parentId;
-
-  nodesToDelete.forEach((node) => {
-    delete state.nodesById[node.id];
-    delete state.childrenById[node.id];
-  });
-  delete state.nodesById[existingNodeCheck.data.id];
-  delete state.childrenById[existingNodeCheck.data.id];
-
-  if (parentId) {
-    state.childrenById[parentId] = (state.childrenById[parentId] ?? []).filter(id => id !== nodeId);
-    const validDeletion = assertOrderKeysStrict(state, parentId);
-    if (!validDeletion.success) return validDeletion;
-  }
-
-  return { success: true, data: state };
-}
-
 export function moveNode(initialState: TreeState, nodeId: string, parentId: string): OperationResult<TreeState> {
   const validMoveCheck = assertValidMove(initialState, nodeId, parentId);
   if (!validMoveCheck.success) return validMoveCheck;
@@ -157,6 +133,30 @@ export function reorderSibling(initialState: TreeState, nodeId: string, newIndex
 
   const orderCheck = assertOrderKeysStrict(state, parentId);
   if (!orderCheck.success) return orderCheck;
+
+  return { success: true, data: state };
+}
+
+export function deleteNode(initialState: TreeState, nodeId: string): OperationResult<TreeState> {
+  const existingNodeCheck = assertNodeExists(initialState, nodeId);
+  if (!existingNodeCheck.success) return existingNodeCheck;
+
+  const state = cloneTreeState(initialState);
+  const nodesToDelete = findDescendantNodes(state, nodeId);
+  const parentId = existingNodeCheck.data.parentId;
+
+  nodesToDelete.forEach((node) => {
+    delete state.nodesById[node.id];
+    delete state.childrenById[node.id];
+  });
+  delete state.nodesById[existingNodeCheck.data.id];
+  delete state.childrenById[existingNodeCheck.data.id];
+
+  if (parentId) {
+    state.childrenById[parentId] = (state.childrenById[parentId] ?? []).filter(id => id !== nodeId);
+    const validDeletion = assertOrderKeysStrict(state, parentId);
+    if (!validDeletion.success) return validDeletion;
+  }
 
   return { success: true, data: state };
 }

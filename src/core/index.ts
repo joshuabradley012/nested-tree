@@ -1,6 +1,7 @@
 import type {
   Node,
   TreeState,
+  OperationResult,
 } from "./types";
 import {
   createTreeState,
@@ -15,6 +16,7 @@ import {
 
 export {
   Node,
+  OperationResult,
   TreeState,
   createTreeState,
   deleteNode,
