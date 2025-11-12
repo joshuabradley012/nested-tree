@@ -77,6 +77,8 @@ D
   - Pros: fast reads, no recursion, moderately complex writes, supports DAGs as well as trees
   - Cons: complex implementation, large storage requirements O(n^2) in the worst case
 
+I have chosen to implement an adjacency list. In a mature production instance, one may find that users want to share schema fragments (e.g. reusable schemas like {image, headline, copy}), reference properties from other trees (e.g. company address), or perform complex subtree queries in which case the complexity of a closure table would be justified.
+
 Also, the order of children must be preserved. Fractional keys are the most scalable way to handle this. Again, let's explore the trade-offs of common fractional key implementations:
 
 - Integers with gaps: 
@@ -92,7 +94,8 @@ Also, the order of children must be preserved. Fractional keys are the most scal
   - Pros: very infrequent compaction, and compaction is limited to subtrees, handles massive scale
   - Cons: complex implementation, recommended to use existing implementations such as LexoRank
 
-Considering all of this, and that we are building a toy example, I have chosen to implement an adjacency list using integer gapped fractional keys. In a mature production instance, one may find that users want to share schema fragments (e.g. reusable schemas like {image, headline, copy}), reference properties from other trees (e.g. company address), or perform complex subtree queries in which case the complexity of a closure table would be justified. Additionally, lexicographic fractional keys would prove more practical in production, but using an existing implementation, as recommended, would defeat the purpose of this toy example.
+For this toy example, integer gapped fractional keys are the pragmatic choice. Lexicographic fractional keys would prove more practical in production, but using an existing implementation, as recommended, would defeat the purpose of this toy example.
+
 
 ## Implementation Details
 
@@ -102,3 +105,5 @@ Considering all of this, and that we are building a toy example, I have chosen t
 - /src/core/ops.ts contains the core adjacency list API (insert, update, delete, move) all of which compose model helpers to create state mutations
   - Currently, insertNode allows one to insert an orderKey, but this is inconsistent with our API for reorder which expects index. May be worth adding newIndex functionality to insert
   - See /test/ops/insertNode.test.ts "normalizes sibling order keys when the gap between neighbors is too small" for how this can result in unexpected behavior, I would expect a collision to append, but it inserts in between
+- /src/App.tsx contains all the front end logic to interact with the tree store
+  - Because this is a toy example, I haven't implemented react-hook-forms or zod like I would in production for validation, error messages, and other UX elements

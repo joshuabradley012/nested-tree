@@ -19,7 +19,8 @@
       "@core/*": ["src/core/*"],
       "@store/*": ["src/store/*"],
       "@adapters/*": ["src/adapters/*"],
-      "@ui/*": ["src/ui/*"],
+      "@components/*": ["src/components/*"],
+      "@ui/*": ["src/components/ui/*"],
       "@tests/*": ["src/tests/*"],
       "@lib/*": ["src/lib/*"],
       "@hooks/*": ["src/hooks/*"]

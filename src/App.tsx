@@ -14,6 +14,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@ui/dialog";
+import { TreeNode } from "@components/TreeNode";
 
 function App() {
   const {
@@ -31,15 +32,16 @@ function App() {
 
   const handleAddNode = useCallback((event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const parentId = event.currentTarget.id;
     const formData = Object.fromEntries(new FormData(event.currentTarget));
-    if (typeof formData.name !== "string") return;
+    if (typeof parentId !== "string" || parentId === "" || typeof formData.name !== "string") return;
     const newNode: Node = {
       id: crypto.randomUUID(),
       name: formData.name,
-      parentId: state.rootId, 
+      parentId, 
       orderKey: "",
     };
-    insertNode(state.rootId, newNode);
+    insertNode(parentId, newNode);
   }, []);
 
   return (
@@ -47,15 +49,15 @@ function App() {
       <h1 className="text-4xl font-semibold">Nested Tree</h1>
 
       <div className="my-6 space-y-2">
-        {(state.childrenById[state.rootId] ?? []).map((childId) => {
-          const child = state.nodesById[childId];
-          if (!child) return null;
-          return (
-            <div key={child.id} className="rounded-md border px-4 py-2">
-              {child.name || "Untitled node"}
-            </div>
-          );
-        })}
+        {(state.childrenById[state.rootId] ?? []).map((childId) => (
+          <TreeNode
+            key={childId}
+            nodeId={childId}
+            nodesById={state.nodesById}
+            childrenById={state.childrenById}
+            onAddSubnode={handleAddNode}
+          />
+        ))}
       </div>
 
       <Dialog>
@@ -63,13 +65,13 @@ function App() {
           <Button>Add node</Button>
         </DialogTrigger>
         <DialogContent>
-          <form onSubmit={handleAddNode} className="flex flex-col gap-4">
+          <form id={state.rootId} onSubmit={handleAddNode} className="flex flex-col gap-4">
             <DialogHeader>
               <DialogTitle>
                 Create new node
               </DialogTitle>
               <DialogDescription>
-                Nodes will insert at the end of the nested tree, name is optional.
+                This will insert a new node at the end of the nested tree.
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-2">
