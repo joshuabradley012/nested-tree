@@ -1,11 +1,8 @@
 function App(): JSX.Element {
   return (
-    <div className="app-shell">
-      <header>
-        <h1>Nested Tree</h1>
-        <p>Tree editing playground coming soon.</p>
-      </header>
-    </div>
+    <main className="mx-auto max-w-2xl py-8">
+      <h1 className="text-4xl font-semibold">Nested Tree</h1>
+    </main>
   );
 }
 

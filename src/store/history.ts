@@ -58,7 +58,7 @@ class HistoryStore {
 
   redo() {
     const entry = this.future.pop();
-    if (!entry) return
+    if (!entry) return;
 
     this.state = applyPatches(this.state, entry.inversePatches);
     this.past.push(entry);
@@ -112,7 +112,15 @@ class HistoryStore {
   }
   
   private emit() {
-    this.listeners.forEach((listener) => listener())
+    this.listeners.forEach((listener) => listener());
+  }
+
+  get canUndo() {
+    return this.past.length > 0;
+  }
+
+  get canRedo() {
+    return this.future.length > 0;
   }
 }
 
