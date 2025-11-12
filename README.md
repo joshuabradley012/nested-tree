@@ -36,11 +36,11 @@ The dev server boots on `http://localhost:5173` by default (see `vite.config.ts`
 
 In order to choose the correct implementation of our nested tree, it is important to consider how users will interact with this drag-and-drop schema editor, including what future needs they may have. My assumptions are listed below:
 
-- Insert: users will frequently insert new nodes into the tree
-- Update: users will frequently update the node's properties
-- Move: users will frequently move leaf nodes and subtrees
-- Delete: users will sometimes delete nodes from the tree
-- Query: users will most often search for the root node (e.g. I want to edit the blog post schema) and will rarely search for a specific subtree (e.g. I want to edit every schema that has an image field)
+- Insert: frequent
+- Update: frequent
+- Move: frequent
+- Delete: occasional
+- Query: frequent root node queries (e.g. I want to edit the blog post schema) infrequent subtree queries (e.g. I want to edit every schema that has an image field)
 - DB persistence: required
 - Structure: sparse tree, no circular references. Future needs for sharable fragments would create a DAG
 - Multiplayer/CRDTs: future requirement
