@@ -1,5 +1,6 @@
 import {
   applyPatches,
+  enablePatches,
   produceWithPatches,
   Patch,
 } from "immer";
@@ -125,3 +126,5 @@ class HistoryStore {
 }
 
 export const historyStore = new HistoryStore();
+
+enablePatches();

@@ -21,7 +21,8 @@
       "@adapters/*": ["src/adapters/*"],
       "@ui/*": ["src/ui/*"],
       "@tests/*": ["src/tests/*"],
-      "@lib/*": ["src/lib/*"]
+      "@lib/*": ["src/lib/*"],
+      "@hooks/*": ["src/hooks/*"]
     },
     "types": ["vite/client"]
   },

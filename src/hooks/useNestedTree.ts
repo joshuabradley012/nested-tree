@@ -27,7 +27,7 @@ export function useNestedTree(): UseNestedTreeResult {
 
   const getSnapshot = useCallback(() => historyStore.snapshot, []);
 
-  const state = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const state = useSyncExternalStore(subscribe, getSnapshot);
 
   const undo = useCallback(() => {
     historyStore.undo();
@@ -61,4 +61,3 @@ export function useNestedTree(): UseNestedTreeResult {
     ...actions,
   };
 }
-
