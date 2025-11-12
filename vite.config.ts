@@ -1,9 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { resolve } from "node:path";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
   resolve: {
     alias: {
       "@core": resolve(__dirname, "src/core"),
@@ -11,21 +15,21 @@ export default defineConfig({
       "@adapters": resolve(__dirname, "src/adapters"),
       "@ui": resolve(__dirname, "src/ui"),
       "@tests": resolve(__dirname, "src/tests"),
-      "@lib": resolve(__dirname, "src/lib")
+      "@lib": resolve(__dirname, "src/lib"),
     }
   },
   server: {
     port: 5173,
-    strictPort: true
+    strictPort: true,
   },
   test: {
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
     coverage: {
       reporter: ["text", "html"],
-      provider: "v8"
+      provider: "v8",
     },
-    css: true
-  }
+    css: true,
+  },
 });
 
