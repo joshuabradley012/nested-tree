@@ -21,6 +21,34 @@ import {
   assertValidMove,
 } from "./invariants";
 
+function insertChildIdSorted(state: TreeState, parentId: string, childId: string) {
+  const childNode = state.nodesById[childId];
+  const childOrder = childNode ? parseInt(childNode.orderKey) : Number.NaN;
+  const children = state.childrenById[parentId] ?? [];
+
+  if (Number.isNaN(childOrder)) {
+    children.push(childId);
+    state.childrenById[parentId] = children;
+    return;
+  }
+
+  const insertIndex = children.findIndex((existingChildId) => {
+    const existingChild = state.nodesById[existingChildId];
+    if (!existingChild) return false;
+    const existingOrder = parseInt(existingChild.orderKey);
+    if (Number.isNaN(existingOrder)) return false;
+    return existingOrder > childOrder;
+  });
+
+  if (insertIndex === -1) {
+    children.push(childId);
+  } else {
+    children.splice(insertIndex, 0, childId);
+  }
+
+  state.childrenById[parentId] = children;
+}
+
 export function insertNode(initialState: TreeState, parentId: string, node: Node): OperationResult<TreeState> {
   const validNodeCheck = assertNodeIsValid(node);
   if (!validNodeCheck.success) return validNodeCheck;
@@ -40,15 +68,16 @@ export function insertNode(initialState: TreeState, parentId: string, node: Node
   const { nextOrderKey, normalizedOrderKeys, sortedChildren } = prepareInsertOrderKey(state, parentId, nextNode);
   nextNode.orderKey = nextOrderKey;
   state.childrenById[parentId] ??= [];
+  state.nodesById[nextNode.id] = nextNode;
   if (normalizedOrderKeys !== null && sortedChildren.length > 0) {
     sortedChildren.forEach((child) => {
       child.orderKey = normalizedOrderKeys[child.id];
+      state.nodesById[child.id] = child;
     });
-    state.childrenById[parentId] = sortedChildren.map(child => child.id)
+    state.childrenById[parentId] = sortedChildren.map(child => child.id);
   } else {
-    state.childrenById[parentId].push(nextNode.id);
+    insertChildIdSorted(state, parentId, nextNode.id);
   }
-  state.nodesById[nextNode.id] = nextNode;
 
   const orderCheck = assertOrderKeysStrict(state, parentId);
   if (!orderCheck.success) return orderCheck;
@@ -83,15 +112,16 @@ export function moveNode(initialState: TreeState, nodeId: string, parentId: stri
   const { nextOrderKey, normalizedOrderKeys, sortedChildren } = prepareInsertOrderKey(state, parentId, nextNode);
   nextNode.orderKey = nextOrderKey;
   state.childrenById[parentId] ??= [];
+  state.nodesById[nextNode.id] = nextNode;
   if (normalizedOrderKeys !== null && sortedChildren.length > 0) {
     sortedChildren.forEach(child => {
       child.orderKey = normalizedOrderKeys[child.id];
+      state.nodesById[child.id] = child;
     });
-    state.childrenById[parentId] = sortedChildren.map(child => child.id)
+    state.childrenById[parentId] = sortedChildren.map(child => child.id);
   } else {
-    state.childrenById[parentId].push(nextNode.id);
+    insertChildIdSorted(state, parentId, nextNode.id);
   }
-  state.nodesById[nextNode.id] = nextNode;
 
   const destinationOrderCheck = assertOrderKeysStrict(state, parentId);
   if (!destinationOrderCheck.success) return destinationOrderCheck;

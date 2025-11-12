@@ -1,4 +1,4 @@
-import { useCallback, type FormEvent } from "react";
+import { type FormEvent } from "react";
 import { Node } from "@core";
 import { useNestedTree } from "@hooks/useNestedTree";
 import { Button } from "@ui/button";
@@ -34,7 +34,7 @@ function App() {
     deleteNode,
   } = useNestedTree();
 
-  const handleInsert = useCallback((event: FormEvent<HTMLFormElement>) => {
+  const handleInsert = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const parentId = event.currentTarget.id;
     const formData = Object.fromEntries(new FormData(event.currentTarget));
@@ -46,13 +46,13 @@ function App() {
       orderKey: "",
     };
     insertNode(parentId, newNode);
-  }, []);
+  };
 
-  const handleDelete = useCallback((nodeId: string) => {
+  const handleDelete = (nodeId: string) => {
     deleteNode(nodeId);
-  }, []);
+  };
 
-  const handleUpdate = useCallback((event: FormEvent<HTMLFormElement>) => {
+  const handleUpdate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nodeId = event.currentTarget.id;
     const formData = Object.fromEntries(new FormData(event.currentTarget));
@@ -64,15 +64,19 @@ function App() {
       name: formData.name,
     };
     updateNode(nodeId, newNode);
-  }, []);
+  };
 
-  const handleMove = useCallback((nodeId: string, parentId: string) => {
+  const handleMove = (nodeId: string, parentId: string, targetIndex?: number) => {
+    const result = moveNode(nodeId, parentId);
+    if (!result.success) return;
+    if (typeof targetIndex === "number") {
+      reorderSibling(nodeId, targetIndex);
+    }
+  };
 
-  }, []);
-
-  const handleReorder = useCallback((nodeId: string, newIndex: number) => {
-
-  }, []);
+  const handleReorder = (nodeId: string, newIndex: number) => {
+    reorderSibling(nodeId, newIndex);
+  };
 
   return (
     <main className="mx-auto max-w-2xl py-8">
