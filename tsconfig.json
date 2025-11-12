@@ -20,7 +20,8 @@
       "@store/*": ["src/store/*"],
       "@adapters/*": ["src/adapters/*"],
       "@ui/*": ["src/ui/*"],
-      "@tests/*": ["src/tests/*"]
+      "@tests/*": ["src/tests/*"],
+      "@lib/*": ["src/lib/*"]
     },
     "types": ["vite/client"]
   },

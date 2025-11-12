@@ -10,7 +10,8 @@ export default defineConfig({
       "@store": resolve(__dirname, "src/store"),
       "@adapters": resolve(__dirname, "src/adapters"),
       "@ui": resolve(__dirname, "src/ui"),
-      "@tests": resolve(__dirname, "src/tests")
+      "@tests": resolve(__dirname, "src/tests"),
+      "@lib": resolve(__dirname, "src/lib")
     }
   },
   server: {
