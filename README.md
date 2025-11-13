@@ -2,6 +2,8 @@
 
 Bootstrap project for experimenting with hierarchical tree editing primitives.
 
+Live preview: https://nested-tree-x7s.s3.us-west-1.amazonaws.com/index.html
+
 ## Getting Started
 
 ```bash
