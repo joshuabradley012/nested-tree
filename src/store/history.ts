@@ -23,11 +23,15 @@ type HistoryEntry = {
 
 type Listener = () => void;
 
-class HistoryStore {
-  private state: TreeState = createTreeState();
+export class HistoryStore {
+  private state: TreeState;
   private past: HistoryEntry[] = [];
   private future: HistoryEntry[] = [];
   private listeners = new Set<Listener>();
+
+  constructor(initialState: TreeState = createTreeState()) {
+    this.state = initialState;
+  }
 
   subscribe(listener: Listener) {
     this.listeners.add(listener);
@@ -123,6 +127,10 @@ class HistoryStore {
   get canRedo() {
     return this.future.length > 0;
   }
+}
+
+export function createHistoryStore(initialState?: TreeState) {
+  return new HistoryStore(initialState);
 }
 
 export const historyStore = new HistoryStore();
