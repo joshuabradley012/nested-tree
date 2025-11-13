@@ -97,13 +97,50 @@ Also, the order of children must be preserved. Fractional keys are the most scal
 For this toy example, integer gapped fractional keys are the pragmatic choice. Lexicographic fractional keys would prove more practical in production, but using an existing implementation, as recommended, would defeat the purpose of this toy example.
 
 
-## Implementation Details
+## Implementation Notes
 
-- /src/core/model.ts contains useful, stateless primitives for maniuplating our adjacency list
+- /src/core/model.ts
+  - Contains useful, stateless primitives for maniuplating our adjacency list
   - With one exception, primitives take advantage of recursion. This creates a larger memory footprint, but a more elegant implementation. Because this is a toy example, I chose algorithmic purity over pragmatism. The exception is `assertCycleFree` which must use iteration to avoid getting stuck in a recursive subroutine
   - In production, there should be more guards against malformed data containing cycles, multiple parents, etc
-- /src/core/ops.ts contains the core adjacency list API (insert, update, delete, move) all of which compose model helpers to create state mutations
-  - Currently, insertNode allows one to insert an orderKey, but this is inconsistent with our API for reorder which expects index. May be worth adding newIndex functionality to insert
-  - See /test/ops/insertNode.test.ts "normalizes sibling order keys when the gap between neighbors is too small" for how this can result in unexpected behavior, I would expect a collision to append, but it inserts in between
-- /src/App.tsx contains all the front end logic to interact with the tree store
+- /src/core/ops.ts
+  - Contains the core adjacency list API (insert, update, delete, move) all of which compose model helpers to create state mutations
+- /src/App.tsx
   - Because this is a toy example, I haven't implemented react-hook-forms or zod like I would in production for validation, error messages, and other UX elements
+
+## Complexity Table
+
+| Operation        | Time Complexity | Notes                                                                 |
+| ---------------- | --------------- | --------------------------------------------------------------------- |
+| `insertNode`     | O(k)            | Validates parent, normalizes sibling order keys when gaps close.      |
+| `updateNode`     | O(1)            | Direct node update after validation.                                  |
+| `moveNode`       | O(k)            | Removes from original parent, recomputes order key in destination.    |
+| `reorderSibling` | O(k)            | Repositions within sibling array and renormalizes order keys.         |
+| `deleteNode`     | O(n)`†`         | Removes node and descendants; `n` is subtree size.                     |
+
+`†` Subtree size dominates; higher-level structures can mitigate with cached indexes.
+
+## Testing
+
+There are unit tests covering all critical functionality. You can run them using:
+
+```bash
+npm test
+```
+
+## Roadmap
+
+This toy example serves as a scalable substrate for future improvements. If inspired, or motivated to create a production instance of this, I will work on the following:
+
+- Keyboard controls (tab focus, arrow keys to move nodes, common shortcuts for Delete, Enter, Ctrl+Z, Ctrl+R)
+- Drag and drop using DnD kit
+- Extend Node to handle props beyond just "name"
+  - For example, key, type, default value
+  - Would include integraing react-hook-form and zod for validation
+- Advanced UI to create custom schemas (input, textarea, date pickers, select, group, images, etc.)
+  - Nesting would be limited to only the group field
+- Pretty print to observe the tree as a JSON object (like the example at the top of this README)
+- Import/export schemas
+- Persistence layer with remote or local storage
+- Integration with Yjs for multiplayer CRDTs
+- Integration with OpenAI structured outputs to generate schemas or content via text commands
