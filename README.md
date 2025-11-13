@@ -128,6 +128,10 @@ There are unit tests covering all critical functionality. You can run them using
 npm test
 ```
 
+For a quick performance sanity check (inserts + reorders), the suite includes `/src/tests/performance/performance.test.ts`, which runs automatically with the command above.
+
+On my machine, the history store performs 500 operations on 500 children in ~800ms.
+
 ## Roadmap
 
 This toy example serves as a scalable substrate for future improvements. If inspired, or motivated to create a production instance of this, I will work on the following:
