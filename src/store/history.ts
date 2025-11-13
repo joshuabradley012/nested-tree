@@ -86,12 +86,20 @@ export class HistoryStore {
     return result;
   }
 
-  moveNode(nodeId: string, parentId: string): OperationResult<TreeState> {
-    const result = moveOp(this.state, nodeId, parentId);
-    if (!result.success) return result;
+  moveNode(nodeId: string, parentId: string, targetIndex?: number): OperationResult<TreeState> {
+    const moveResult = moveOp(this.state, nodeId, parentId);
+    if (!moveResult.success) return moveResult;
 
-    this.commit(result.data);
-    return result;
+    let nextState = moveResult.data;
+
+    if (typeof targetIndex === "number") {
+      const reorderResult = reorderOp(nextState, nodeId, targetIndex);
+      if (!reorderResult.success) return reorderResult;
+      nextState = reorderResult.data;
+    }
+
+    this.commit(nextState);
+    return { success: true, data: nextState };
   }
 
   reorderSibling(nodeId: string, newIndex: number): OperationResult<TreeState> {

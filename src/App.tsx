@@ -48,10 +48,6 @@ function App() {
     insertNode(parentId, newNode);
   };
 
-  const handleDelete = (nodeId: string) => {
-    deleteNode(nodeId);
-  };
-
   const handleUpdate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nodeId = event.currentTarget.id;
@@ -66,12 +62,12 @@ function App() {
     updateNode(nodeId, newNode);
   };
 
+  const handleDelete = (nodeId: string) => {
+    deleteNode(nodeId);
+  };
+
   const handleMove = (nodeId: string, parentId: string, targetIndex?: number) => {
-    const result = moveNode(nodeId, parentId);
-    if (!result.success) return;
-    if (typeof targetIndex === "number") {
-      reorderSibling(nodeId, targetIndex);
-    }
+    moveNode(nodeId, parentId, targetIndex);
   };
 
   const handleReorder = (nodeId: string, newIndex: number) => {

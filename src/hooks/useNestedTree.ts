@@ -6,7 +6,7 @@ import { historyStore } from "@store/history";
 type HistoryActions = {
   insertNode: (parentId: string, node: Node) => OperationResult<TreeState>;
   updateNode: (nodeId: string, node: Node) => OperationResult<TreeState>;
-  moveNode: (nodeId: string, parentId: string) => OperationResult<TreeState>;
+  moveNode: (nodeId: string, parentId: string, targetIndex?: number) => OperationResult<TreeState>;
   reorderSibling: (nodeId: string, newIndex: number) => OperationResult<TreeState>;
   deleteNode: (nodeId: string) => OperationResult<TreeState>;
 };
@@ -41,7 +41,8 @@ export function useNestedTree(): UseNestedTreeResult {
     () => ({
       insertNode: (parentId, node) => historyStore.insertNode(parentId, node),
       updateNode: (nodeId, node) => historyStore.updateNode(nodeId, node),
-      moveNode: (nodeId, parentId) => historyStore.moveNode(nodeId, parentId),
+      moveNode: (nodeId, parentId, targetIndex) =>
+        historyStore.moveNode(nodeId, parentId, targetIndex),
       reorderSibling: (nodeId, newIndex) =>
         historyStore.reorderSibling(nodeId, newIndex),
       deleteNode: (nodeId) => historyStore.deleteNode(nodeId),

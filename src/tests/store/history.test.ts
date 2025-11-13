@@ -68,5 +68,37 @@ describe("HistoryStore undo/redo", () => {
     expect(store.canUndo).toBe(true);
     expect(store.canRedo).toBe(false);
   });
+
+  it("treats move with ordering adjustment as a single undoable action", () => {
+    const store = createStore();
+    const rootId = store.snapshot.rootId;
+    const parent = createNode(rootId, "parent-node", "Parent");
+    const child = createNode(rootId, "child-node", "Child");
+
+    expect(store.insertNode(rootId, parent).success).toBe(true);
+    expect(store.insertNode(rootId, child).success).toBe(true);
+    expect(store.snapshot.childrenById[rootId]).toEqual([parent.id, child.id]);
+
+    expect(store.moveNode(child.id, parent.id, 0).success).toBe(true);
+
+    expect(store.snapshot.childrenById[rootId]).toEqual([parent.id]);
+    expect(store.snapshot.childrenById[parent.id]).toEqual([child.id]);
+    expect(store.canUndo).toBe(true);
+    expect(store.canRedo).toBe(false);
+
+    store.undo();
+
+    expect(store.snapshot.childrenById[rootId]).toEqual([parent.id, child.id]);
+    expect(store.snapshot.childrenById[parent.id] ?? []).toEqual([]);
+    expect(store.canUndo).toBe(true);
+    expect(store.canRedo).toBe(true);
+
+    store.redo();
+
+    expect(store.snapshot.childrenById[rootId]).toEqual([parent.id]);
+    expect(store.snapshot.childrenById[parent.id]).toEqual([child.id]);
+    expect(store.canUndo).toBe(true);
+    expect(store.canRedo).toBe(false);
+  });
 });
 

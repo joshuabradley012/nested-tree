@@ -97,7 +97,7 @@ export function TreeNode({
 
   return (
     <>
-      <div className="rounded-md border p-1 flex justify-between items-center">
+      <div className="rounded-md border p-1 flex justify-between items-center bg-neutral-100">
         <p className="pl-2">{node.name || "Untitled node"}</p>
         <div className="grid grid-cols-3 size-9 ml-auto mr-2">
           <Button
@@ -177,7 +177,7 @@ export function TreeNode({
               <form id={node.id} onSubmit={onUpdate} className="flex flex-col gap-4">
                 <DialogHeader>
                   <DialogTitle>
-                    Update node
+                    Edit node
                   </DialogTitle>
                   <DialogDescription>
                     This will change the name of the node.
@@ -206,7 +206,7 @@ export function TreeNode({
         </div>
       </div>
       {childrenIds.map((id) => (
-        <div key={id} className="ml-4 space-y-2">
+        <div key={id} className="pl-4 space-y-2 border-l">
           <TreeNode
             nodeId={id}
             nodesById={nodesById}
